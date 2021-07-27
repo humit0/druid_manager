@@ -112,7 +112,9 @@ func (druidClient *DruidClient) CreateRequest(method string, serverType string, 
 		log.Fatalf("Cannot get server url (server type: %s)", serverType)
 	}
 
-	requestURL := fmt.Sprintf("%s/%s", serverURLs[0], path)
+	requestURL := fmt.Sprintf("%s%s", serverURLs[0], path)
+
+	log.Printf("requestURL: %s, method: %s", requestURL, method)
 
 	req, err := http.NewRequest(method, requestURL, requestBody)
 
@@ -138,7 +140,7 @@ func GetResponse(req *http.Request, result interface{}) {
 	err = json.Unmarshal(body, &result)
 
 	if err != nil {
-		log.Fatalf("Failed to parse response (%v)", err)
+		log.Fatalf("Failed to parse response (%v)\nBody: %s", err, body)
 	}
 }
 
