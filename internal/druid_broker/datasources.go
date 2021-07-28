@@ -4,9 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/humit0/druid_manager/internal/druid"
+	"github.com/sirupsen/logrus"
+)
+
+var (
+	entry = logrus.WithFields(logrus.Fields{"type": "datasource", "server": "broker"})
 )
 
 type DatasourceResponseType struct {
@@ -47,7 +51,7 @@ func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string) []map[string]
 
 	body, err := json.Marshal(jsonBody)
 	if err != nil {
-		log.Fatalf("Cannot serialize json (%v)", jsonBody)
+		entry.Fatalf("Cannot serialize json (%v)", jsonBody)
 	}
 
 	druidClient.SendRequest("POST", "broker", "/druid/v2/sql/", bytes.NewBuffer(body), &result)

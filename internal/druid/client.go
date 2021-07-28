@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"sort"
+	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 // 드루이드 클라이언트
@@ -38,6 +40,10 @@ type SimpleServerEntity struct {
 	MaxSize  string
 }
 
+var (
+	entry = logrus.StandardLogger()
+)
+
 // 서버 주소를 정렬합니다.
 func (druidClient *DruidClient) sortServer() {
 	sort.Strings(druidClient.CoordinatorURLs)
@@ -50,9 +56,10 @@ func (druidClient *DruidClient) sortServer() {
 
 // 클라이언트 관련 정보를 초기화합니다.
 func (druidClient *DruidClient) InitClient(routerURL string) {
+	routerURL = strings.TrimRight(routerURL, "/")
 	// router 쪽에 주소를 추가했다가
 	druidClient.RouterURLs = append(druidClient.RouterURLs, routerURL)
-	result := []SimpleServerEntity{}
+	var result []SimpleServerEntity
 	druidClient.SendRequest("GET", "router", "/druid/coordinator/v1/servers", nil, &result)
 
 	// 다시 제거합니다.
@@ -74,7 +81,7 @@ func (druidClient *DruidClient) InitClient(routerURL string) {
 		case "router":
 			druidClient.RouterURLs = append(druidClient.RouterURLs, server.Host)
 		default:
-			log.Fatalf("Unsupported server type (%s)", server.Type)
+			entry.Fatalf("Unsupported server type (%s)", server.Type)
 		}
 	}
 	druidClient.sortServer()
@@ -96,30 +103,30 @@ func (druidClient *DruidClient) GetServerList(serverType string) []string {
 	case "router":
 		return druidClient.RouterURLs
 	default:
-		log.Fatalf("Invalid server type (%s)", serverType)
+		entry.Fatalf("Invalid server type (%s)", serverType)
 	}
 	return nil
 }
 
 // HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내는 `http.Request` 객체를 생성합니다.
 func (druidClient *DruidClient) CreateRequest(method string, serverType string, path string, requestBody io.Reader) *http.Request {
-	if druidClient.Username == "" || druidClient.Password == "" {
-		log.Fatal("You should specify username and password")
-	}
 	serverURLs := druidClient.GetServerList(serverType)
 
 	if len(serverURLs) == 0 {
-		log.Fatalf("Cannot get server url (server type: %s)", serverType)
+		entry.Fatalf("Cannot get server url (server type: %s)", serverType)
 	}
-
 	requestURL := fmt.Sprintf("%s%s", serverURLs[0], path)
 
-	log.Printf("requestURL: %s, method: %s", requestURL, method)
+	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s", method, requestURL))
+	if druidClient.Username == "" || druidClient.Password == "" {
+		entryWithReq.Fatal("You should specify username and password")
+	}
 
+	entryWithReq.Info("Create new request")
 	req, err := http.NewRequest(method, requestURL, requestBody)
 
 	if err != nil {
-		log.Fatalf("Cannot create request object (%v)", err)
+		entryWithReq.Fatalf("Cannot create request object (%v)", err)
 	}
 	req.SetBasicAuth(druidClient.Username, druidClient.Password)
 	return req
@@ -130,8 +137,10 @@ func GetResponse(req *http.Request, result interface{}) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
+	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s%s", req.Method, req.Host, req.URL.Path))
+
 	if err != nil {
-		log.Fatalf("Failed to get response (%v)", err)
+		entryWithReq.Fatalf("Failed to get response (%v)", err)
 	}
 	defer resp.Body.Close()
 
@@ -140,7 +149,7 @@ func GetResponse(req *http.Request, result interface{}) {
 	err = json.Unmarshal(body, &result)
 
 	if err != nil {
-		log.Fatalf("Failed to parse response (%v)\nBody: %s", err, body)
+		entryWithReq.Fatalf("Failed to parse response (%v)\nBody: %s", err, body)
 	}
 }
 
