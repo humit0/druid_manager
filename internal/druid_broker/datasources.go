@@ -46,7 +46,7 @@ func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string) []map[string]
 	var result []map[string]interface{}
 
 	jsonBody := make(map[string]interface{})
-	jsonBody["sql"] = sqlQuery
+	jsonBody["query"] = sqlQuery
 	jsonBody["resultFormat"] = "object"
 
 	body, err := json.Marshal(jsonBody)
@@ -62,7 +62,7 @@ func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string) []map[string]
 // Druid native 쿼리를 실행하여 결과를 반환합니다.
 func SendNativeQuery(druidClient *druid.DruidClient, nativeQuery string) []map[string]interface{} {
 	var result []map[string]interface{}
-	druidClient.SendRequest("POST", "broker", "/druid/v2/", nil, &result)
+	druidClient.SendRequest("POST", "broker", "/druid/v2/", bytes.NewBuffer([]byte(nativeQuery)), &result)
 
 	return result
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"sort"
 	"strings"
@@ -137,14 +138,15 @@ func GetResponse(req *http.Request, result interface{}) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
-	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s%s", req.Method, req.Host, req.URL.Path))
+	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s://%s%s", req.Method, req.URL.Scheme, req.Host, req.URL.Path))
 
 	if err != nil {
 		entryWithReq.Fatalf("Failed to get response (%v)", err)
 	}
 	defer resp.Body.Close()
 
-	body, _ := io.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
+	entryWithReq.Debugf("respBody: %s", body)
 
 	err = json.Unmarshal(body, &result)
 
@@ -161,29 +163,23 @@ func (druidClient *DruidClient) SendRequest(method string, serverType string, pa
 
 // 서버 목록을 druid 클러스터 별로 출력합니다.
 func (druidClient *DruidClient) ShowServers() {
-	fmt.Printf("== Coordinate server ==\n")
 	for _, serverURL := range druidClient.CoordinatorURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "coordinator").Infof("url: %s", serverURL)
 	}
-	fmt.Printf("\n== Overlord server ==\n")
 	for _, serverURL := range druidClient.OverlordURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "overlord").Infof("url: %s", serverURL)
 	}
-	fmt.Printf("\n== Historical server ==\n")
 	for _, serverURL := range druidClient.HistoricalURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "historical").Infof("url: %s", serverURL)
 	}
-	fmt.Printf("\n== MiddleManager server ==\n")
 	for _, serverURL := range druidClient.MiddleManagerURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "middleManager").Infof("url: %s", serverURL)
 	}
-	fmt.Printf("\n== Broker server ==\n")
 	for _, serverURL := range druidClient.BrokerURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "broker").Infof("url: %s", serverURL)
 	}
 
-	fmt.Printf("\n== Router server ==\n")
 	for _, serverURL := range druidClient.RouterURLs {
-		fmt.Printf("* %s\n", serverURL)
+		entry.WithField("server", "router").Infof("url: %s", serverURL)
 	}
 }
