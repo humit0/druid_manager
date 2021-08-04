@@ -130,6 +130,8 @@ func (druidClient *DruidClient) CreateRequest(method string, serverType string, 
 		entryWithReq.Fatalf("Cannot create request object (%v)", err)
 	}
 	req.SetBasicAuth(druidClient.Username, druidClient.Password)
+	req.Header.Add("Content-Type", "application/json")
+
 	return req
 }
 
@@ -163,6 +165,7 @@ func (druidClient *DruidClient) SendRequest(method string, serverType string, pa
 
 // 서버 목록을 druid 클러스터 별로 출력합니다.
 func (druidClient *DruidClient) ShowServers() {
+	entry.Info("Druid cluster list")
 	for _, serverURL := range druidClient.CoordinatorURLs {
 		entry.WithField("server", "coordinator").Infof("url: %s", serverURL)
 	}

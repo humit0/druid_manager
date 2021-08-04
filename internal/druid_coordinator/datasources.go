@@ -6,13 +6,14 @@ import (
 )
 
 var (
-	entry = logrus.WithFields(logrus.Fields{"type": "datasource", "server": "coordinator"})
+	datasourceEntry = baseEntry.WithFields(logrus.Fields{"type": "datasource"})
 )
 
 // 해당 druid 서버에 있는 전체 데이터 소스 목록을 반환합니다.
-func GetDatasources(druidClient *druid.DruidClient) []string {
+func GetDatasourceList(druidClient *druid.DruidClient) []string {
 	var result []string
 
+	datasourceEntry.Debug("Get datasource list")
 	druidClient.SendRequest("GET", "coordinator", "/druid/coordinator/v1/datasources", nil, &result)
 	return result
 }

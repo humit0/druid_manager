@@ -1,16 +1,13 @@
 package druid_broker
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 
 	"github.com/humit0/druid_manager/internal/druid"
-	"github.com/sirupsen/logrus"
 )
 
 var (
-	entry = logrus.WithFields(logrus.Fields{"type": "datasource", "server": "broker"})
+	datasourceEntry = baseEntry.WithField("type", "datasource")
 )
 
 type DatasourceResponseType struct {
@@ -23,6 +20,9 @@ func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName str
 	response := DatasourceResponseType{}
 
 	druidClient.SendRequest("GET", "broker", fmt.Sprintf("/druid/v2/datasources/%s", datasourceName), nil, &response)
+
+	datasourceEntry.Debugf("dimension: %v", response.Dimensions)
+	datasourceEntry.Debugf("metric: %v", response.Metrics)
 
 	return response.Dimensions, response.Metrics
 }
@@ -37,32 +37,6 @@ func GetDatasourceDimensions(druidClient *druid.DruidClient, datasourceName stri
 // 해당 데이터 소스에 속한 측정 값 컬럼명을 반환합니다.
 func GetDatasourceMetrics(druidClient *druid.DruidClient, datasourceName string) []string {
 	_, result := getDatasourceColumnsInfo(druidClient, datasourceName)
-
-	return result
-}
-
-// Druid SQL 쿼리를 실행하여 결과를 반환합니다.
-func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string) []map[string]interface{} {
-	var result []map[string]interface{}
-
-	jsonBody := make(map[string]interface{})
-	jsonBody["query"] = sqlQuery
-	jsonBody["resultFormat"] = "object"
-
-	body, err := json.Marshal(jsonBody)
-	if err != nil {
-		entry.Fatalf("Cannot serialize json (%v)", jsonBody)
-	}
-
-	druidClient.SendRequest("POST", "broker", "/druid/v2/sql/", bytes.NewBuffer(body), &result)
-
-	return result
-}
-
-// Druid native 쿼리를 실행하여 결과를 반환합니다.
-func SendNativeQuery(druidClient *druid.DruidClient, nativeQuery string) []map[string]interface{} {
-	var result []map[string]interface{}
-	druidClient.SendRequest("POST", "broker", "/druid/v2/", bytes.NewBuffer([]byte(nativeQuery)), &result)
 
 	return result
 }
