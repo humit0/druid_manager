@@ -9,7 +9,7 @@ var (
 	datasourceEntry = baseEntry.WithFields(logrus.Fields{"type": "datasource"})
 )
 
-// 해당 druid 서버에 있는 전체 데이터 소스 목록을 반환합니다.
+// GetDatasourceList 함수는 해당 druid 서버에 있는 전체 데이터 소스 목록을 반환합니다.
 func GetDatasourceList(druidClient *druid.DruidClient) []string {
 	var result []string
 

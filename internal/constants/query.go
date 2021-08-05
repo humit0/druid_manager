@@ -39,6 +39,7 @@ FROM "{{ .datasourceName }}"{{ if .time }}
 GROUP BY 1{{ end }}`
 )
 
+// templateQuery 함수는 템플릿으로 만든 쿼리를 사용할 수 있는 쿼리로 변환해줍니다.
 func templateQuery(queryName string, queryTpl string, val interface{}) string {
 	tpl := template.New(queryName)
 	tpl, err := tpl.Parse(queryTpl)
@@ -58,7 +59,7 @@ func templateQuery(queryName string, queryTpl string, val interface{}) string {
 	return result.String()
 }
 
-// count 컬럼과 데이터소스 명을 입력하여 일자별 rollup 비율을 계산하는 쿼리를 반환합니다.
+// GetRollupRatioByDatasourceQuery 함수는 count 컬럼과 데이터소스 명을 입력하여 일자별 rollup 비율을 계산하는 쿼리를 반환합니다.
 func GetRollupRatioByDatasourceQuery(countColName string, datasourceName string, groupByTime bool) string {
 	var mapping = map[string]string{"countColName": countColName, "datasourceName": datasourceName}
 	if groupByTime {
@@ -67,7 +68,7 @@ func GetRollupRatioByDatasourceQuery(countColName string, datasourceName string,
 	return templateQuery("rollupQuery", getRollupRatioByDatasourceQueryTpl, &mapping)
 }
 
-// count 컬럼과 데이터소스 명을 입력하여 일자별 데이터 건 수 계산하는 쿼리를 반환합니다.
+// GetDataCntByDatasourceQuery 함수는 count 컬럼과 데이터소스 명을 입력하여 일자별 데이터 건 수 계산하는 쿼리를 반환합니다.
 func GetDataCntByDatasourceQuery(countColName string, datasourceName string, groupByTime bool) string {
 	var mapping = map[string]string{"countColName": countColName, "datasourceName": datasourceName}
 	if groupByTime {

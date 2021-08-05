@@ -15,7 +15,7 @@ type DatasourceResponseType struct {
 	Metrics    []string
 }
 
-// 해당 데이터 소스에 속한 컬럼명 정보를 반환합니다. (차원, 측정 값 순서)
+// getDatasourceColumnsInfo 함수는 해당 데이터 소스에 속한 컬럼명 정보를 반환합니다. (차원, 측정 값 순서)
 func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName string) ([]string, []string) {
 	response := DatasourceResponseType{}
 
@@ -27,14 +27,14 @@ func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName str
 	return response.Dimensions, response.Metrics
 }
 
-// 해당 데이터 소스에 속한 차원 컬럼명을 반환합니다.
+// GetDatasourceDimensions 함수는 해당 데이터 소스에 속한 차원 컬럼명을 반환합니다.
 func GetDatasourceDimensions(druidClient *druid.DruidClient, datasourceName string) []string {
 	result, _ := getDatasourceColumnsInfo(druidClient, datasourceName)
 
 	return result
 }
 
-// 해당 데이터 소스에 속한 측정 값 컬럼명을 반환합니다.
+// GetDatasourceMetrics 함수는 해당 데이터 소스에 속한 측정 값 컬럼명을 반환합니다.
 func GetDatasourceMetrics(druidClient *druid.DruidClient, datasourceName string) []string {
 	_, result := getDatasourceColumnsInfo(druidClient, datasourceName)
 

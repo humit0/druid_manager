@@ -12,7 +12,7 @@ var (
 	lookupEntry = baseEntry.WithFields(logrus.Fields{"type": "lookup"})
 )
 
-// 해당 druid 서버에 있는 전체 Lookup 목록을 반환합니다.
+// GetLookupList 함수는 해당 druid 서버에 있는 전체 Lookup 목록을 반환합니다.
 func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
 	var result []string
 
@@ -21,7 +21,7 @@ func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
 	return result
 }
 
-// 해당 druid 서버에 있는 전체 Lookup에 대한 상태를 조회합니다.
+// GetLookupsStatus 함수는 해당 druid 서버에 있는 전체 Lookup에 대한 상태를 조회합니다.
 func GetLookupsStatus(druidClient *druid.DruidClient, tier string) map[string]bool {
 	var respBody map[string]struct {
 		Loaded bool `json:"loaded"`
@@ -90,7 +90,7 @@ type LookupConfigType struct {
 	} `json:"lookupExtractorFactory"`
 }
 
-// 해당 druid 서버에 있는 Lookup에 대한 설정을 반환합니다.
+// GetLookupConfig 함수는 해당 druid 서버에 있는 Lookup에 대한 설정을 반환합니다.
 func GetLookupConfig(druidClient *druid.DruidClient, tier string, lookup_name string) LookupConfigType {
 	var result LookupConfigType
 

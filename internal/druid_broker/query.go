@@ -11,7 +11,7 @@ var (
 	queryEntry = baseEntry.WithField("type", "query")
 )
 
-// Druid SQL 쿼리를 실행하여 결과를 반환합니다.
+// SendSQLQuery 함수는 Druid SQL 쿼리를 실행하여 결과를 반환합니다.
 func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string, queryResult interface{}) {
 	jsonBody := make(map[string]interface{})
 	jsonBody["query"] = sqlQuery
@@ -27,7 +27,7 @@ func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string, queryResult i
 	druidClient.SendRequest("POST", "broker", "/druid/v2/sql/", bytes.NewBuffer(body), &queryResult)
 }
 
-// Druid native 쿼리를 실행하여 결과를 반환합니다.
+// SendNativeQuery 함수는 Druid native 쿼리를 실행하여 결과를 반환합니다.
 func SendNativeQuery(druidClient *druid.DruidClient, nativeQuery string, queryResult interface{}) {
 	queryEntry.Debugf("Sending native query (%s)", nativeQuery)
 

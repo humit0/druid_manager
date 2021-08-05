@@ -1,5 +1,4 @@
-// Druid client package
-// 드루이드 API를 호출할 때 사용하는 클라이언트 내용을 구현합니다.
+// package druid는 드루이드 API를 호출할 때 사용하는 클라이언트 내용을 구현합니다.
 package druid
 
 import (
@@ -14,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// 드루이드 클라이언트
+// DruidClient 구조체는 드루이드 클라이언트 관련 정보를 포함합니다.
 type DruidClient struct {
 	// Master server
 	CoordinatorURLs []string
@@ -31,7 +30,7 @@ type DruidClient struct {
 	Password string
 }
 
-// 서버 목록에 대한 응답을 받을 때 사용하는 JSON 타입입니다.
+// SimpleServerEntity 구조체는 서버 목록에 대한 응답을 받을 때 사용하는 JSON 타입입니다.
 type SimpleServerEntity struct {
 	Host     string
 	Tier     string
@@ -45,7 +44,7 @@ var (
 	entry = logrus.StandardLogger()
 )
 
-// 서버 주소를 정렬합니다.
+// sortServer 함수는 서버 주소를 정렬합니다.
 func (druidClient *DruidClient) sortServer() {
 	sort.Strings(druidClient.CoordinatorURLs)
 	sort.Strings(druidClient.OverlordURLs)
@@ -55,7 +54,7 @@ func (druidClient *DruidClient) sortServer() {
 	sort.Strings(druidClient.RouterURLs)
 }
 
-// 클라이언트 관련 정보를 초기화합니다.
+// InitClient 함수는 라우터 주소를 받아서 클라이언트 관련 정보를 초기화합니다.
 func (druidClient *DruidClient) InitClient(routerURL string) {
 	routerURL = strings.TrimRight(routerURL, "/")
 	// router 쪽에 주소를 추가했다가
@@ -88,7 +87,7 @@ func (druidClient *DruidClient) InitClient(routerURL string) {
 	druidClient.sortServer()
 }
 
-// druid 클러스터 종류를 입력받아서 해당 서버 목록을 반환합니다.
+// GetServerList 함수는 druid 클러스터 종류를 입력받아서 해당 서버 목록을 반환합니다.
 func (druidClient *DruidClient) GetServerList(serverType string) []string {
 	switch serverType {
 	case "coordinator":
@@ -109,7 +108,7 @@ func (druidClient *DruidClient) GetServerList(serverType string) []string {
 	return nil
 }
 
-// HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내는 `http.Request` 객체를 생성합니다.
+// CreateRequest 함수는 HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내는 `http.Request` 객체를 생성합니다.
 func (druidClient *DruidClient) CreateRequest(method string, serverType string, path string, requestBody io.Reader) *http.Request {
 	serverURLs := druidClient.GetServerList(serverType)
 
@@ -135,7 +134,7 @@ func (druidClient *DruidClient) CreateRequest(method string, serverType string, 
 	return req
 }
 
-// `http.Request` 객체의 응답을 받아서 JSON으로 파싱합니다.
+// GetResponse 함수는 `http.Request` 객체의 응답을 받아서 JSON으로 파싱합니다.
 func GetResponse(req *http.Request, result interface{}) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -157,13 +156,13 @@ func GetResponse(req *http.Request, result interface{}) {
 	}
 }
 
-// HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내고 해당 응답을 JSON으로 파싱합니다.
+// SendRequest 함수는 HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내고 해당 응답을 JSON으로 파싱합니다.
 func (druidClient *DruidClient) SendRequest(method string, serverType string, path string, requestBody io.Reader, result interface{}) {
 	req := druidClient.CreateRequest(method, serverType, path, requestBody)
 	GetResponse(req, &result)
 }
 
-// 서버 목록을 druid 클러스터 별로 출력합니다.
+// ShowServers 함수는 서버 목록을 druid 클러스터 별로 출력합니다.
 func (druidClient *DruidClient) ShowServers() {
 	entry.Info("Druid cluster list")
 	for _, serverURL := range druidClient.CoordinatorURLs {
