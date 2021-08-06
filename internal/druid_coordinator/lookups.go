@@ -16,7 +16,7 @@ var (
 func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
 	var result []string
 
-	lookupEntry.Debug("Get lookup list (tier: %s)", tier)
+	lookupEntry.Debugf("Get lookup list (tier: %s)", tier)
 	druidClient.SendRequest("GET", "coordinator", fmt.Sprintf("/druid/coordinator/v1/lookups/config/%s", url.PathEscape(tier)), nil, &result)
 	return result
 }
