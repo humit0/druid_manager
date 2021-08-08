@@ -2,8 +2,8 @@
 package druid
 
 import (
+	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -108,16 +108,18 @@ func (druidClient *DruidClient) GetServerList(serverType string) []string {
 	return nil
 }
 
-// CreateRequest 함수는 HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내는 `http.Request` 객체를 생성합니다.
-func (druidClient *DruidClient) CreateRequest(method string, serverType string, path string, requestBody io.Reader) *http.Request {
+// CreateRequestWithIndex 함수는 HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내는 `http.Request` 객체를 생성합니다.
+func (druidClient *DruidClient) CreateRequestWithIndex(method string, serverType string, serverIndex int, path string, requestBody io.Reader) *http.Request {
 	serverURLs := druidClient.GetServerList(serverType)
 
-	if len(serverURLs) == 0 {
-		entry.Fatalf("Cannot get server url (server type: %s)", serverType)
+	if len(serverURLs) == 0 || serverIndex >= len(serverURLs) || serverIndex < 0 {
+		entry.Fatalf("Cannot get server url (server type: %s) [index: %d]", serverType, serverIndex)
 	}
-	requestURL := fmt.Sprintf("%s%s", serverURLs[0], path)
+	requestURLBuff := bytes.NewBufferString(serverURLs[serverIndex])
+	requestURLBuff.WriteString(path)
+	requestURL := requestURLBuff.String()
 
-	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s", method, requestURL))
+	entryWithReq := entry.WithField("method", method).WithField("url", requestURL)
 	if druidClient.Username == "" || druidClient.Password == "" {
 		entryWithReq.Fatal("You should specify username and password")
 	}
@@ -139,7 +141,12 @@ func GetResponse(req *http.Request, result interface{}) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 
-	entryWithReq := entry.WithField("req", fmt.Sprintf("%s %s://%s%s", req.Method, req.URL.Scheme, req.Host, req.URL.Path))
+	urlBuff := bytes.NewBufferString(req.URL.Scheme)
+	urlBuff.WriteString("://")
+	urlBuff.WriteString(req.Host)
+	urlBuff.WriteString(req.URL.Path)
+
+	entryWithReq := entry.WithField("method", req.Method).WithField("url", urlBuff.String())
 
 	if err != nil {
 		entryWithReq.Fatalf("Failed to get response (%v)", err)
@@ -156,10 +163,15 @@ func GetResponse(req *http.Request, result interface{}) {
 	}
 }
 
+// SendRequestWithIndex 함수는 HTTP 메서드, druid 클러스터 종류, path, body, 서버 index를 입력받아서 해당 요청을 보내고 해당 응답을 JSON으로 파싱합니다.
+func (druidClient *DruidClient) SendRequestWithIndex(method string, serverType string, serverIndex int, path string, requestBody io.Reader, result interface{}) {
+	req := druidClient.CreateRequestWithIndex(method, serverType, serverIndex, path, requestBody)
+	GetResponse(req, &result)
+}
+
 // SendRequest 함수는 HTTP 메서드, druid 클러스터 종류, path, body를 입력받아서 해당 요청을 보내고 해당 응답을 JSON으로 파싱합니다.
 func (druidClient *DruidClient) SendRequest(method string, serverType string, path string, requestBody io.Reader, result interface{}) {
-	req := druidClient.CreateRequest(method, serverType, path, requestBody)
-	GetResponse(req, &result)
+	druidClient.SendRequestWithIndex(method, serverType, 0, path, requestBody, &result)
 }
 
 // ShowServers 함수는 서버 목록을 druid 클러스터 별로 출력합니다.
