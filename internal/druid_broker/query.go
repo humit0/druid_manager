@@ -3,8 +3,6 @@ package druid_broker
 import (
 	"bytes"
 	"encoding/json"
-
-	"github.com/humit0/druid_manager/internal/druid"
 )
 
 var (
@@ -12,7 +10,7 @@ var (
 )
 
 // SendSQLQuery 함수는 Druid SQL 쿼리를 실행하여 결과를 반환합니다.
-func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string, queryResult interface{}) {
+func (brokerService BrokerServiceImp) SendSQLQuery(sqlQuery string, queryResult interface{}) {
 	jsonBody := make(map[string]interface{})
 	jsonBody["query"] = sqlQuery
 	jsonBody["resultFormat"] = "object"
@@ -24,12 +22,12 @@ func SendSQLQuery(druidClient *druid.DruidClient, sqlQuery string, queryResult i
 
 	queryEntry.Debugf("Sending sql query (%s)", body)
 
-	druidClient.SendRequest("POST", "broker", "/druid/v2/sql/", bytes.NewBuffer(body), &queryResult)
+	brokerService.DruidClient.SendRequest("POST", "broker", "/druid/v2/sql/", bytes.NewBuffer(body), &queryResult)
 }
 
 // SendNativeQuery 함수는 Druid native 쿼리를 실행하여 결과를 반환합니다.
-func SendNativeQuery(druidClient *druid.DruidClient, nativeQuery string, queryResult interface{}) {
+func (brokerService BrokerServiceImp) SendNativeQuery(nativeQuery string, queryResult interface{}) {
 	queryEntry.Debugf("Sending native query (%s)", nativeQuery)
 
-	druidClient.SendRequest("POST", "broker", "/druid/v2/", bytes.NewBuffer([]byte(nativeQuery)), &queryResult)
+	brokerService.DruidClient.SendRequest("POST", "broker", "/druid/v2/", bytes.NewBuffer([]byte(nativeQuery)), &queryResult)
 }

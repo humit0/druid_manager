@@ -3,8 +3,6 @@ package druid_broker
 import (
 	"bytes"
 	"net/url"
-
-	"github.com/humit0/druid_manager/internal/druid"
 )
 
 var (
@@ -17,13 +15,13 @@ type DatasourceResponseType struct {
 }
 
 // getDatasourceColumnsInfo 함수는 해당 데이터 소스에 속한 컬럼명 정보를 반환합니다. (차원, 측정 값 순서)
-func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName string) ([]string, []string) {
+func (brokerService BrokerServiceImp) getDatasourceColumnsInfo(datasourceName string) ([]string, []string) {
 	response := DatasourceResponseType{}
 
 	urlBuff := bytes.NewBufferString("/druid/v2/datsources/")
 	urlBuff.WriteString(url.PathEscape(datasourceName))
 
-	druidClient.SendRequest("GET", "broker", urlBuff.String(), nil, &response)
+	brokerService.DruidClient.SendRequest("GET", "broker", urlBuff.String(), nil, &response)
 
 	datasourceEntry.Debugf("dimension: %v", response.Dimensions)
 	datasourceEntry.Debugf("metric: %v", response.Metrics)
@@ -32,15 +30,15 @@ func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName str
 }
 
 // GetDatasourceDimensions 함수는 해당 데이터 소스에 속한 차원 컬럼명을 반환합니다.
-func GetDatasourceDimensions(druidClient *druid.DruidClient, datasourceName string) []string {
-	result, _ := getDatasourceColumnsInfo(druidClient, datasourceName)
+func (brokerService BrokerServiceImp) GetDatasourceDimensions(datasourceName string) []string {
+	result, _ := brokerService.getDatasourceColumnsInfo(datasourceName)
 
 	return result
 }
 
 // GetDatasourceMetrics 함수는 해당 데이터 소스에 속한 측정 값 컬럼명을 반환합니다.
-func GetDatasourceMetrics(druidClient *druid.DruidClient, datasourceName string) []string {
-	_, result := getDatasourceColumnsInfo(druidClient, datasourceName)
+func (brokerService BrokerServiceImp) GetDatasourceMetrics(datasourceName string) []string {
+	_, result := brokerService.getDatasourceColumnsInfo(datasourceName)
 
 	return result
 }

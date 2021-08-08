@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/humit0/druid_manager/internal/constants"
 	"github.com/sirupsen/logrus"
 )
 
@@ -28,6 +29,9 @@ type DruidClient struct {
 	// Authentication
 	Username string
 	Password string
+
+	// Druid Service
+	BrokerSvc BrokerService
 }
 
 // SimpleServerEntity 구조체는 서버 목록에 대한 응답을 받을 때 사용하는 JSON 타입입니다.
@@ -54,34 +58,35 @@ func (druidClient *DruidClient) sortServer() {
 	sort.Strings(druidClient.RouterURLs)
 }
 
-// InitClient 함수는 라우터 주소를 받아서 클라이언트 관련 정보를 초기화합니다.
-func (druidClient *DruidClient) InitClient(routerURL string) {
-	routerURL = strings.TrimRight(routerURL, "/")
-	// router 쪽에 주소를 추가했다가
-	druidClient.RouterURLs = append(druidClient.RouterURLs, routerURL)
-	var result []SimpleServerEntity
-	druidClient.SendRequest("GET", "router", "/druid/coordinator/v1/servers", nil, &result)
+// InitClient 함수는 브로커 주소를 받아서 클라이언트 관련 정보를 초기화합니다.
+func (druidClient *DruidClient) InitClient(brokerURL string) {
+	brokerURL = strings.TrimRight(brokerURL, "/")
+	// broker 쪽에 주소를 추가했다가
+	druidClient.BrokerURLs = append(druidClient.BrokerURLs, brokerURL)
+
+	var result []constants.ServerListItem
+	druidClient.BrokerSvc.SendSQLQuery(constants.ServerListQuery, &result)
 
 	// 다시 제거합니다.
-	druidClient.RouterURLs = druidClient.RouterURLs[:0]
+	druidClient.BrokerURLs = druidClient.BrokerURLs[:0]
 
 	// 서버 정보를 순회하면서 추가합니다.
 	for _, server := range result {
-		switch server.Type {
+		switch server.ServerType {
 		case "coordinator":
-			druidClient.CoordinatorURLs = append(druidClient.CoordinatorURLs, server.Host)
+			druidClient.CoordinatorURLs = append(druidClient.CoordinatorURLs, server.Server)
 		case "overlord":
-			druidClient.OverlordURLs = append(druidClient.OverlordURLs, server.Host)
+			druidClient.OverlordURLs = append(druidClient.OverlordURLs, server.Server)
 		case "historical":
-			druidClient.HistoricalURLs = append(druidClient.HistoricalURLs, server.Host)
+			druidClient.HistoricalURLs = append(druidClient.HistoricalURLs, server.Server)
 		case "middleManager":
-			druidClient.MiddleManagerURLs = append(druidClient.MiddleManagerURLs, server.Host)
+			druidClient.MiddleManagerURLs = append(druidClient.MiddleManagerURLs, server.Server)
 		case "broker":
-			druidClient.BrokerURLs = append(druidClient.BrokerURLs, server.Host)
+			druidClient.BrokerURLs = append(druidClient.BrokerURLs, server.Server)
 		case "router":
-			druidClient.RouterURLs = append(druidClient.RouterURLs, server.Host)
+			druidClient.RouterURLs = append(druidClient.RouterURLs, server.Server)
 		default:
-			entry.Fatalf("Unsupported server type (%s)", server.Type)
+			entry.Fatalf("Unsupported server type (%s)", server.ServerType)
 		}
 	}
 	druidClient.sortServer()
