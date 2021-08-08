@@ -15,7 +15,7 @@ type DatasourceResponseType struct {
 }
 
 // getDatasourceColumnsInfo 함수는 해당 데이터 소스에 속한 컬럼명 정보를 반환합니다. (차원, 측정 값 순서)
-func (brokerService BrokerServiceImp) getDatasourceColumnsInfo(datasourceName string) ([]string, []string) {
+func (brokerService *BrokerServiceImp) getDatasourceColumnsInfo(datasourceName string) ([]string, []string) {
 	response := DatasourceResponseType{}
 
 	urlBuff := bytes.NewBufferString("/druid/v2/datsources/")
@@ -30,14 +30,14 @@ func (brokerService BrokerServiceImp) getDatasourceColumnsInfo(datasourceName st
 }
 
 // GetDatasourceDimensions 함수는 해당 데이터 소스에 속한 차원 컬럼명을 반환합니다.
-func (brokerService BrokerServiceImp) GetDatasourceDimensions(datasourceName string) []string {
+func (brokerService *BrokerServiceImp) GetDatasourceDimensions(datasourceName string) []string {
 	result, _ := brokerService.getDatasourceColumnsInfo(datasourceName)
 
 	return result
 }
 
 // GetDatasourceMetrics 함수는 해당 데이터 소스에 속한 측정 값 컬럼명을 반환합니다.
-func (brokerService BrokerServiceImp) GetDatasourceMetrics(datasourceName string) []string {
+func (brokerService *BrokerServiceImp) GetDatasourceMetrics(datasourceName string) []string {
 	_, result := brokerService.getDatasourceColumnsInfo(datasourceName)
 
 	return result

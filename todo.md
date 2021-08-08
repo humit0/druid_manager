@@ -18,7 +18,7 @@
 - [ ] 워커 상태 API
 
 ## Historical
-- [ ] 세그먼트 로딩 API
+- [X] 세그먼트 로딩 API
 
 ## Broker
 - [ ] 데이터 소스 API

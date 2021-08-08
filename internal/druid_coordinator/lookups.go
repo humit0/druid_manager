@@ -13,7 +13,7 @@ var (
 )
 
 // GetLookupList 함수는 해당 druid 서버에 있는 전체 Lookup 목록을 반환합니다.
-func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
+func (coordinatorService *CoordinatorServiceImp) GetLookupList(tier string) []string {
 	var result []string
 
 	lookupEntry.Debugf("Get lookup list (tier: %s)", tier)
@@ -21,12 +21,12 @@ func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
 	urlBuff := bytes.NewBufferString("/druid/coodinator/v1/lookups/config/")
 	urlBuff.WriteString(url.PathEscape(tier))
 
-	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
+	coordinatorService.DruidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
 	return result
 }
 
 // GetLookupsStatus 함수는 해당 druid 서버에 있는 전체 Lookup에 대한 상태를 조회합니다.
-func GetLookupsStatus(druidClient *druid.DruidClient, tier string) map[string]bool {
+func (coordinatorService *CoordinatorServiceImp) GetLookupsStatus(tier string) map[string]bool {
 	var respBody map[string]struct {
 		Loaded bool `json:"loaded"`
 	}
@@ -36,7 +36,7 @@ func GetLookupsStatus(druidClient *druid.DruidClient, tier string) map[string]bo
 	urlBuff := bytes.NewBufferString("/druid/coordinator/v1/lookups/status/")
 	urlBuff.WriteString(url.PathEscape(tier))
 
-	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &respBody)
+	coordinatorService.DruidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &respBody)
 
 	result := make(map[string]bool)
 
@@ -47,68 +47,17 @@ func GetLookupsStatus(druidClient *druid.DruidClient, tier string) map[string]bo
 	return result
 }
 
-type LookupConfigType struct {
-	Version                string `json:"version"`
-	LookupExtractorFactory struct {
-		Type string `json:"type"`
-		// map type
-		Mapping map[string]string `json:"map,omitempty"`
-
-		// cachedNamespace type
-		ExtractionNamespace struct {
-			Type       string `json:"type"`
-			PollPeriod string `json:"pollPeriod,omitempty"`
-
-			// URI Lookup
-			NamespaceParseSpec struct {
-				// csv, tsv format
-				Format         string   `json:"format"`
-				Columns        []string `json:"columns,omitempty"`
-				KeyColumn      string   `json:"keyColumn,omitempty"`
-				ValueColumn    string   `json:"valueColumn,omitempty"`
-				HasHeaderRow   bool     `json:"hasHeaderRow,omitempty"`
-				SkipHeaderRows int32    `json:"skipHeaderRows,omitempty"`
-				// tsv format
-				Delimiter     string `json:"delimiter,omitempty"`
-				ListDelimiter string `json:"listDelimiter,omitempty"`
-
-				// customJson format
-				KeyFieldName   string `json:"keyFieldName,omitempty"`
-				ValueFieldName string `json:"valueFieldName,omitempty"`
-			} `json:"namespaceParseSpec,omitempty"`
-			Uri       string `json:"uri,omitempty"`
-			UriPrefix string `json:"uriPrefix,omitempty"`
-			FileRegex string `json:"fileRegex,omitempty"`
-
-			// JDBC Lookup
-			ConnectorConfig struct {
-				ConnectURI string `json:"connectURI"`
-				User       string `json:"user"`
-				Password   string `json:"password"`
-			} `json:"connectorConfig,omitempty"`
-			Table       string `json:"table,omitempty"`
-			KeyColumn   string `json:"keyColumn,omitempty"`
-			ValueColumn string `json:"valueColumn,omitempty"`
-			Filter      string `json:"filter,omitempty"`
-			TsColumn    string `json:"tsColumn,omitempty"`
-		} `json:"extractionNamespace,omitempty"`
-
-		FirstCacheTimeout int32 `json:"firstCacheTimeout,omitempty"`
-		Injective         bool  `json:"injective,omitempty"`
-	} `json:"lookupExtractorFactory"`
-}
-
 // GetLookupConfig 함수는 해당 druid 서버에 있는 Lookup에 대한 설정을 반환합니다.
-func GetLookupConfig(druidClient *druid.DruidClient, tier string, lookup_name string) LookupConfigType {
-	var result LookupConfigType
+func (coordinatorService *CoordinatorServiceImp) GetLookupConfig(tier string, lookupName string) druid.LookupConfigType {
+	var result druid.LookupConfigType
 
-	lookupEntry.Debugf("Get lookup config (tier: %s, lookup_name: %s)", tier, lookup_name)
+	lookupEntry.Debugf("Get lookup config (tier: %s, lookupName: %s)", tier, lookupName)
 
 	urlBuff := bytes.NewBufferString("/druid/coordinator/v1/lookups/config/")
 	urlBuff.WriteString(url.PathEscape(tier))
 	urlBuff.WriteString("/")
-	urlBuff.WriteString(url.PathEscape(lookup_name))
+	urlBuff.WriteString(url.PathEscape(lookupName))
 
-	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
+	coordinatorService.DruidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
 	return result
 }

@@ -13,16 +13,8 @@ var (
 	taskEntry = baseEntry.WithFields(logrus.Fields{"type": "task"})
 )
 
-type TaskQueryParamType struct {
-	State               string `url:"state,omitempty"`
-	Datasource          string `url:"datasource,omitempty"`
-	CreatedTimeInterval string `url:"createdTimeInterval,omitempty"`
-	Max                 int    `url:"max,omitempty"`
-	TaskType            string `url:"taskType,omitempty"`
-}
-
 // GetAllTaskList 함수는 조건에 맞는 테스크 목록을 반환합니다.
-func GetAllTaskList(druidClient *druid.DruidClient, queryParam TaskQueryParamType) interface{} {
+func (overlordSvc *OverlordServiceImp) GetAllTaskList(queryParam druid.TaskQueryParamType) interface{} {
 	var result interface{}
 
 	taskEntry.Debugf("Get all task list (state=%s)", queryParam.State)
@@ -37,12 +29,12 @@ func GetAllTaskList(druidClient *druid.DruidClient, queryParam TaskQueryParamTyp
 		urlBuf.WriteString(paramString)
 	}
 
-	druidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
+	overlordSvc.DruidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
 	return result
 }
 
 // GetTaskPayload 함수는 전달한 `taskId`에 해당하는 태스크의 payload를 반환합니다.
-func GetTaskPayload(druidClient *druid.DruidClient, taskId string) interface{} {
+func (overlordSvc *OverlordServiceImp) GetTaskPayload(taskId string) interface{} {
 	var result interface{}
 
 	taskEntry.Debugf("Get task payload (taskId=%s)", taskId)
@@ -50,12 +42,12 @@ func GetTaskPayload(druidClient *druid.DruidClient, taskId string) interface{} {
 	urlBuf := bytes.NewBufferString("/druid/indexer/v1/task/")
 	urlBuf.WriteString(url.PathEscape(taskId))
 
-	druidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
+	overlordSvc.DruidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
 	return result
 }
 
 // GetTaskStatus 함수는 전달한 `taskId`에 해당하는 태스크의 상태를 반환합니다.
-func GetTaskStatus(druidClient *druid.DruidClient, taskId string) interface{} {
+func (overlordSvc *OverlordServiceImp) GetTaskStatus(taskId string) interface{} {
 	var result interface{}
 
 	taskEntry.Debugf("Get task status (taskId=%s)", taskId)
@@ -64,6 +56,6 @@ func GetTaskStatus(druidClient *druid.DruidClient, taskId string) interface{} {
 	urlBuf.WriteString(url.PathEscape(taskId))
 	urlBuf.WriteString("/status")
 
-	druidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
+	overlordSvc.DruidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
 	return result
 }

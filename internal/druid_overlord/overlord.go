@@ -3,8 +3,15 @@
 
 package druid_overlord
 
-import "github.com/sirupsen/logrus"
+import (
+	"github.com/humit0/druid_manager/internal/druid"
+	"github.com/sirupsen/logrus"
+)
 
 var (
 	baseEntry = logrus.WithFields(logrus.Fields{"server": "overlord"})
 )
+
+type OverlordServiceImp struct {
+	DruidClient druid.DruidClient
+}
