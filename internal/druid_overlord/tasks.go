@@ -2,6 +2,7 @@ package druid_overlord
 
 import (
 	"bytes"
+	"net/url"
 
 	"github.com/google/go-querystring/query"
 	"github.com/humit0/druid_manager/internal/druid"
@@ -29,9 +30,8 @@ func GetAllTaskList(druidClient *druid.DruidClient, queryParam TaskQueryParamTyp
 	params, _ := query.Values(queryParam)
 	paramString := params.Encode()
 	taskEntry.Debugf("param: %s", paramString)
-	var urlBuf bytes.Buffer
 
-	urlBuf.WriteString("/druid/indexer/v1/tasks")
+	urlBuf := bytes.NewBufferString("/druid/indexer/v1/tasks")
 	if paramString != "" {
 		urlBuf.WriteString("?")
 		urlBuf.WriteString(paramString)
@@ -47,9 +47,8 @@ func GetTaskPayload(druidClient *druid.DruidClient, taskId string) interface{} {
 
 	taskEntry.Debugf("Get task payload (taskId=%s)", taskId)
 
-	var urlBuf bytes.Buffer
-	urlBuf.WriteString("/druid/indexer/v1/task/")
-	urlBuf.WriteString(taskId)
+	urlBuf := bytes.NewBufferString("/druid/indexer/v1/task/")
+	urlBuf.WriteString(url.PathEscape(taskId))
 
 	druidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)
 	return result
@@ -61,9 +60,8 @@ func GetTaskStatus(druidClient *druid.DruidClient, taskId string) interface{} {
 
 	taskEntry.Debugf("Get task status (taskId=%s)", taskId)
 
-	var urlBuf bytes.Buffer
-	urlBuf.WriteString("/druid/indexer/v1/task/")
-	urlBuf.WriteString(taskId)
+	urlBuf := bytes.NewBufferString("/druid/indexer/v1/task/")
+	urlBuf.WriteString(url.PathEscape(taskId))
 	urlBuf.WriteString("/status")
 
 	druidClient.SendRequest("GET", "overlord", urlBuf.String(), nil, &result)

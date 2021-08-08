@@ -1,7 +1,8 @@
 package druid_broker
 
 import (
-	"fmt"
+	"bytes"
+	"net/url"
 
 	"github.com/humit0/druid_manager/internal/druid"
 )
@@ -19,7 +20,10 @@ type DatasourceResponseType struct {
 func getDatasourceColumnsInfo(druidClient *druid.DruidClient, datasourceName string) ([]string, []string) {
 	response := DatasourceResponseType{}
 
-	druidClient.SendRequest("GET", "broker", fmt.Sprintf("/druid/v2/datasources/%s", datasourceName), nil, &response)
+	urlBuff := bytes.NewBufferString("/druid/v2/datsources/")
+	urlBuff.WriteString(url.PathEscape(datasourceName))
+
+	druidClient.SendRequest("GET", "broker", urlBuff.String(), nil, &response)
 
 	datasourceEntry.Debugf("dimension: %v", response.Dimensions)
 	datasourceEntry.Debugf("metric: %v", response.Metrics)

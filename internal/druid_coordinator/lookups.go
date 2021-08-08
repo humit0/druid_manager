@@ -1,7 +1,7 @@
 package druid_coordinator
 
 import (
-	"fmt"
+	"bytes"
 	"net/url"
 
 	"github.com/humit0/druid_manager/internal/druid"
@@ -17,7 +17,11 @@ func GetLookupList(druidClient *druid.DruidClient, tier string) []string {
 	var result []string
 
 	lookupEntry.Debugf("Get lookup list (tier: %s)", tier)
-	druidClient.SendRequest("GET", "coordinator", fmt.Sprintf("/druid/coordinator/v1/lookups/config/%s", url.PathEscape(tier)), nil, &result)
+
+	urlBuff := bytes.NewBufferString("/druid/coodinator/v1/lookups/config/")
+	urlBuff.WriteString(url.PathEscape(tier))
+
+	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
 	return result
 }
 
@@ -28,7 +32,11 @@ func GetLookupsStatus(druidClient *druid.DruidClient, tier string) map[string]bo
 	}
 
 	lookupEntry.Debugf("Get lookup status list (tier: %s)", tier)
-	druidClient.SendRequest("GET", "coordinator", fmt.Sprintf("/druid/coordinator/v1/lookups/status/%s", url.PathEscape(tier)), nil, &respBody)
+
+	urlBuff := bytes.NewBufferString("/druid/coordinator/v1/lookups/status/")
+	urlBuff.WriteString(url.PathEscape(tier))
+
+	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &respBody)
 
 	result := make(map[string]bool)
 
@@ -95,6 +103,12 @@ func GetLookupConfig(druidClient *druid.DruidClient, tier string, lookup_name st
 	var result LookupConfigType
 
 	lookupEntry.Debugf("Get lookup config (tier: %s, lookup_name: %s)", tier, lookup_name)
-	druidClient.SendRequest("GET", "coordinator", fmt.Sprintf("/druid/coordinator/v1/lookups/config/%s/%s", tier, lookup_name), nil, &result)
+
+	urlBuff := bytes.NewBufferString("/druid/coordinator/v1/lookups/config/")
+	urlBuff.WriteString(url.PathEscape(tier))
+	urlBuff.WriteString("/")
+	urlBuff.WriteString(url.PathEscape(lookup_name))
+
+	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
 	return result
 }

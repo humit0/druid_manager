@@ -1,7 +1,8 @@
 package druid_coordinator
 
 import (
-	"fmt"
+	"bytes"
+	"net/url"
 
 	"github.com/humit0/druid_manager/internal/druid"
 	"github.com/sirupsen/logrus"
@@ -26,7 +27,10 @@ func GetCompactionConfigurationByDatasource(druidClient *druid.DruidClient, data
 	var result interface{}
 	compactionEntry.Debugf("Get datasource(%s) compaction configuration", datasourceName)
 
-	druidClient.SendRequest("GET", "coordinator", fmt.Sprintf("/druid/coordinator/v1/config/compaction/%s", datasourceName), nil, &result)
+	urlBuff := bytes.NewBufferString("/druid/coordinaotor/v1/config/compaction/")
+	urlBuff.WriteString(url.PathEscape(datasourceName))
+
+	druidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
 
 	return result
 }
