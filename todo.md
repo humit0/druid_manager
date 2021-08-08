@@ -9,7 +9,7 @@
 - [ ] Compaction API
 
 ## Overlord
-- [ ] 리더 API
+- [X] 리더 API
 - [ ] Task API
 - [ ] Supervisor API
 - [ ] Dynamaic Configuration API
