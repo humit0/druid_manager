@@ -1,11 +1,11 @@
 name: test-go-code
 on:
   push:
-    - branches:
+    branches:
       - master
       - 'release/**'
   pull_request:
-    - branches:
+    branches:
       - master
 jobs:
   test:
