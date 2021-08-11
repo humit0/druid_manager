@@ -31,10 +31,11 @@ type DruidClient struct {
 	Password string
 
 	// Druid Service
-	BrokerSvc      BrokerService
-	CoordinatorSvc CoordinatorService
-	OverlordSvc    OverlordService
-	HistoricalSvc  HistoricalService
+	BrokerSvc        BrokerService
+	CoordinatorSvc   CoordinatorService
+	OverlordSvc      OverlordService
+	HistoricalSvc    HistoricalService
+	MiddleManagerSvc MiddleManagerService
 }
 
 // SimpleServerEntity 구조체는 서버 목록에 대한 응답을 받을 때 사용하는 JSON 타입입니다.

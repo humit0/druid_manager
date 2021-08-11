@@ -106,3 +106,13 @@ type HistoricalService interface {
 func (druidClient *DruidClient) SetHistoricalSvc(historicalSvc HistoricalService) {
 	druidClient.HistoricalSvc = historicalSvc
 }
+
+type MiddleManagerService interface {
+	GetAllActiveTaskList() []string
+	GetTaskLog(taskId string) string
+	GetWorkerStatus(serverIndex int) map[string]string
+}
+
+func (druidClient *DruidClient) SetMiddleManagerSvc(middleManagerSvc MiddleManagerService) {
+	druidClient.MiddleManagerSvc = middleManagerSvc
+}

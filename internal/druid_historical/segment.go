@@ -6,7 +6,7 @@ var (
 	segmentEntry = baseEntry.WithFields(logrus.Fields{"type": "segment"})
 )
 
-func (historicalSvc HistoricalServiceImp) GetLoadedStatus(serverIndex int) bool {
+func (historicalSvc *HistoricalServiceImp) GetLoadedStatus(serverIndex int) bool {
 	var result struct {
 		CacheInitialized bool `json:"cacheInitialized"`
 	}
