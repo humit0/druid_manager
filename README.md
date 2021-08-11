@@ -1,5 +1,7 @@
 # Druid Manager
 
+![test-go-code](https://github.com/humit0/druid_manager/actions/workflows/test-go-code.yml/badge.svg)
+
 ## 소개
 
 Druid에 대한 내용을 모니터링 및 여러 내용을 관리하기 위한 서버입니다.
