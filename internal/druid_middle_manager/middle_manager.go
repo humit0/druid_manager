@@ -10,5 +10,5 @@ var (
 )
 
 type MiddleManagerServiceImp struct {
-	DruidClient druid.DruidClient
+	DruidClient *druid.DruidClient
 }

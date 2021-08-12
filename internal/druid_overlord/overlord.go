@@ -13,5 +13,5 @@ var (
 )
 
 type OverlordServiceImp struct {
-	DruidClient druid.DruidClient
+	DruidClient *druid.DruidClient
 }
