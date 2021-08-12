@@ -10,5 +10,5 @@ var (
 )
 
 type BrokerServiceImp struct {
-	DruidClient druid.DruidClient
+	DruidClient *druid.DruidClient
 }

@@ -12,5 +12,5 @@ var (
 )
 
 type HistoricalServiceImp struct {
-	DruidClient druid.DruidClient
+	DruidClient *druid.DruidClient
 }

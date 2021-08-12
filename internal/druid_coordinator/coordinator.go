@@ -13,5 +13,5 @@ var (
 )
 
 type CoordinatorServiceImp struct {
-	DruidClient druid.DruidClient
+	DruidClient *druid.DruidClient
 }
