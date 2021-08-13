@@ -105,7 +105,7 @@ func (druidClient *DruidClient) GetServerList(serverType string) []string {
 		return druidClient.OverlordURLs
 	case "historical":
 		return druidClient.HistoricalURLs
-	case "middleManager":
+	case "middle_manager":
 		return druidClient.MiddleManagerURLs
 	case "broker":
 		return druidClient.BrokerURLs
@@ -133,7 +133,7 @@ func (druidClient *DruidClient) CreateRequestWithIndex(method string, serverType
 		entryWithReq.Fatal("You should specify username and password")
 	}
 
-	entryWithReq.Info("Create new request")
+	entryWithReq.Debug("Create new request")
 	req, err := http.NewRequest(method, requestURL, requestBody)
 
 	if err != nil {
