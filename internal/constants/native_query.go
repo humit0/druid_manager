@@ -21,6 +21,11 @@ type SegmentMetadataQueryType struct {
 	LenientAggregatorMerge bool     `json:"lenientAggregatorMerge,omitempty"`
 }
 
+type DatasourceMetadataQueryType struct {
+	QueryType  string `json:"queryType"`
+	Datasource string `json:"dataSource"`
+}
+
 // GetTimeBoundaryQuery 함수는 주어진 `datasource`의 최소 날짜와 최대 날짜를 알아내는 쿼리를 반환합니다.
 func GetTimeBoundaryQuery(datasource string, bound string) string {
 	query := TimeBoundaryQueryType{
@@ -46,6 +51,19 @@ func GetSegmentMetadataQuery(query SegmentMetadataQueryType) string {
 
 	if err != nil {
 		entry.WithField("queryType", "segmentMetadata").Fatalf("Cannot create json object %v", err)
+	}
+
+	return string(res)
+}
+
+// GetDatasourceMetadataQuery 함수는 주어진 `datasource`의 최근 ingestion 시간을 알아내는 쿼리를 반환합니다.
+func GetDatasourceMetadataQuery(query DatasourceMetadataQueryType) string {
+	query.QueryType = "dataSourceMetadata"
+
+	res, err := json.Marshal(query)
+
+	if err != nil {
+		entry.WithField("queryType", "dataSourceMetadata").Fatalf("Cannot create json object %v", err)
 	}
 
 	return string(res)
