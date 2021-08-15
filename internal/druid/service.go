@@ -4,8 +4,8 @@ type BrokerService interface {
 	SendSQLQuery(sqlQuery string, queryResult interface{})
 	SendNativeQuery(nativeQuery string, queryResult interface{})
 
-	GetDatasourceDimensions(datasourceName string) []string
-	GetDatasourceMetrics(datasourceName string) []string
+	GetDatasourceDimensions(datasourceName string, interval string) []string
+	GetDatasourceMetrics(datasourceName string, interval string) []string
 }
 
 func (druidClient *DruidClient) SetBrokerSvc(brokerSvc BrokerService) {

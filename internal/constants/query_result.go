@@ -30,3 +30,14 @@ type DataCntByDatasourceItem struct {
 	DataCnt        int64  `json:"data_cnt"`
 	DatasourceName string `json:"datasource_name"`
 }
+
+// Native 쿼리 결과
+
+// TimeBoundaryItem 구조체는 TimeBoundary 쿼리 결과를 나타냅니다.
+type TimeBoundaryItem struct {
+	Timestamp string `json:"timestamp"`
+	Result    struct {
+		MinTime string `json:"minTime,omitempty"`
+		MaxTime string `json:"maxTime,omitempty"`
+	} `json:"result"`
+}
