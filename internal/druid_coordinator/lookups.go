@@ -18,7 +18,7 @@ func (coordinatorService *CoordinatorServiceImp) GetLookupList(tier string) []st
 
 	lookupEntry.Debugf("Get lookup list (tier: %s)", tier)
 
-	urlBuff := bytes.NewBufferString("/druid/coodinator/v1/lookups/config/")
+	urlBuff := bytes.NewBufferString("/druid/coordinator/v1/lookups/config/")
 	urlBuff.WriteString(url.PathEscape(tier))
 
 	coordinatorService.DruidClient.SendRequest("GET", "coordinator", urlBuff.String(), nil, &result)
@@ -40,8 +40,8 @@ func (coordinatorService *CoordinatorServiceImp) GetLookupsStatus(tier string) m
 
 	result := make(map[string]bool)
 
-	for lookup_name, lookup_status := range respBody {
-		result[lookup_name] = lookup_status.Loaded
+	for lookupName, lookupStatus := range respBody {
+		result[lookupName] = lookupStatus.Loaded
 	}
 
 	return result

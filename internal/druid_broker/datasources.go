@@ -3,7 +3,6 @@ package druid_broker
 import (
 	"bytes"
 	"net/url"
-	"strings"
 )
 
 var (
@@ -24,7 +23,7 @@ func (brokerService *BrokerServiceImp) getDatasourceColumnsInfo(datasourceName s
 
 	if interval != "" {
 		urlBuff.WriteString("?interval=")
-		urlBuff.WriteString(strings.ReplaceAll(interval, "/", "_"))
+		urlBuff.WriteString(interval)
 	}
 
 	brokerService.DruidClient.SendRequest("GET", "broker", urlBuff.String(), nil, &response)

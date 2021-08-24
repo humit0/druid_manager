@@ -76,19 +76,23 @@ func (druidClient *DruidClient) InitClient(brokerURL string) {
 
 	// 서버 정보를 순회하면서 추가합니다.
 	for _, server := range result {
+		serverURLBuff := bytes.NewBufferString("http://")
+		serverURLBuff.WriteString(server.Server)
+		serverURL := serverURLBuff.String()
+
 		switch server.ServerType {
 		case "coordinator":
-			druidClient.CoordinatorURLs = append(druidClient.CoordinatorURLs, server.Server)
+			druidClient.CoordinatorURLs = append(druidClient.CoordinatorURLs, serverURL)
 		case "overlord":
-			druidClient.OverlordURLs = append(druidClient.OverlordURLs, server.Server)
+			druidClient.OverlordURLs = append(druidClient.OverlordURLs, serverURL)
 		case "historical":
-			druidClient.HistoricalURLs = append(druidClient.HistoricalURLs, server.Server)
-		case "middleManager":
-			druidClient.MiddleManagerURLs = append(druidClient.MiddleManagerURLs, server.Server)
+			druidClient.HistoricalURLs = append(druidClient.HistoricalURLs, serverURL)
+		case "middle_manager":
+			druidClient.MiddleManagerURLs = append(druidClient.MiddleManagerURLs, serverURL)
 		case "broker":
-			druidClient.BrokerURLs = append(druidClient.BrokerURLs, server.Server)
+			druidClient.BrokerURLs = append(druidClient.BrokerURLs, serverURL)
 		case "router":
-			druidClient.RouterURLs = append(druidClient.RouterURLs, server.Server)
+			druidClient.RouterURLs = append(druidClient.RouterURLs, serverURL)
 		default:
 			entry.Fatalf("Unsupported server type (%s)", server.ServerType)
 		}

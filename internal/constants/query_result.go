@@ -19,16 +19,14 @@ type TotalSegmentsItem struct {
 
 // RollupRatioByDatasourceItem 구조체는 롤업 비율 쿼리 결과를 나타냅니다.
 type RollupRatioByDatasourceItem struct {
-	Time           string  `json:"__time,omitempty"`
-	RollupRatio    float64 `json:"rollup_ratio"`
-	DatasourceName string  `json:"datasource_name"`
+	Time        string  `json:"__time,omitempty"`
+	RollupRatio float64 `json:"rollup_ratio"`
 }
 
 // DataCntByDatasourceItem 구조체는 총 데이터 수 결과를 나타냅니다.
 type DataCntByDatasourceItem struct {
-	Time           string `json:"__time,omitempty"`
-	DataCnt        int64  `json:"data_cnt"`
-	DatasourceName string `json:"datasource_name"`
+	Time    string `json:"__time,omitempty"`
+	DataCnt int64  `json:"data_cnt"`
 }
 
 // Native 쿼리 결과
