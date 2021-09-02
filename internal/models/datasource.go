@@ -12,6 +12,7 @@ type Datasource struct {
 	Name      string         `gorm:"size:255;unique;not null"`
 	Owner     sql.NullString `gorm:"size:80"`
 	Interval  uint64
+	Monitor   bool `gorm:"default:false"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
