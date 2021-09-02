@@ -7,6 +7,7 @@
 |name|varchar(255)|NOT NULL|
 |owner|varchar(80)|DEFAULT NULL|
 |interval|bigint||
+|monitor|tinyint(1)|DEFAULT 0|
 
 ## datasource_column
 |column_name|column_type|extra|
